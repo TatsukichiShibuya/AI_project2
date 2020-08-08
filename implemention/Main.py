@@ -19,35 +19,32 @@ class Perceptron:
         print('Start learning')
 
         start_time = time.time()
-        count = 0
+        step_count = 0
         best_param = self.param.copy()
         best_correct = 0
         flag = True
 
         while flag:
-            if time.time() - start_time > 1:
+            if time.time() - start_time > 2:
                 break
 
             flag = False
-            count += 1
-            correct = 0
+            step_count += 1
 
-            print('Step:', count)
+            print('Step:', step_count)
             for x, label in zip(self.train.values, self.label):
                 t = np.dot(x, self.param)
                 # print('data:{} label:{} param:{} -> t:{}'.format(
-                #    x, label, self.param, t))
+                #     x, label, self.param, t))
 
                 if np.sign(t) != np.sign(label):
                     print('Miss')
                     flag = True
                     self.param += x*label*self.lr
-                else:
-                    correct += 1
-
-            if correct > best_correct:
-                best_correct = correct
-                best_param = self.param.copy()
+                    correct = self.validate(self.param)
+                    if correct > best_correct:
+                        best_correct = correct
+                        best_param = self.param.copy()
 
             print('----------')
 
@@ -57,6 +54,14 @@ class Perceptron:
             print('Correct: {}/{}'.format(best_correct, self.n))
         else:
             print('Linearly separable')
+
+    def validate(self, param):
+        correct = 0
+        for x, label in zip(self.train.values, self.label):
+            t = np.dot(x, param)
+            if np.sign(t) == np.sign(label):
+                correct += 1
+        return correct
 
     def show(self):
         print('paramater:', self.param)
